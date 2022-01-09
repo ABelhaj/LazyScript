@@ -1,0 +1,177 @@
+#!/bin/bash
+while true;
+do 
+read -p "
+Welcome to Lazy Linux Admin Script
+Please Select the Category:
+A)Networking
+B)Disk Management
+" MainCat
+function networking(){
+	echo "
+	Please Choose The operation:
+	1) Host Information
+	2) Host Network Configuration
+	3) Host Public IP Address
+	4) Open ports and services on Host
+	a) Ping a host
+	b) Checking Open ports
+	X) install all deps
+	z) Get the hell out 
+
+	You are always welcome, Darling
+	"
+while true;
+	do
+	read -p "operation: " Op
+	case $Op in
+	
+		# Server Infomation
+		1) 	echo "
+		Hostname: $(uname -a | awk '{print $2}')
+		
+		CoreSystem: $(uname -a | awk '{print $6}')
+		
+		Linux Distribution: $(uname -a | awk '{print $3}')
+		
+		Memeory Information:
+		$(free -h)"
+		continue;;
+		# Network infomation
+		2) 	netinfo=$(ifconfig)
+		IpAdd=$(ifconfig | sed -n '2p' | awk '{print $2}')
+		NetMask=$(ifconfig | sed -n '2p' | awk '{print $4}')
+		GateWay=$(route -n | sed -n '3p' | awk '{print $2}')
+		echo " your Network information as the follwoing: 
+		IP address: $IpAdd
+		Network mask: $NetMask
+		Gateway: $GateWay
+		"
+		continue;;
+	
+		#Public IP of the Machine
+		3) 	MyPubIP=$(wget -qO - icanhazip.com)
+		echo "This is the server Public IP: $MyPubIP";
+		continue;;
+
+		#check for open ports
+		4) 	Ports=$(netstat -tupln)
+		echo " The Ports information as the following:
+		$Ports
+		" 
+		continue;;
+		# Ping Utility
+		a)
+			read -p "Enter Host/IP: " Host_4Test
+				echo "Pinging Host $Host_4Test"
+				ping -c 1 $Host_4Test
+				if [ "$?" -eq "0" ]
+					then 
+					echo " $Host_4Test is Reachable by ping. "
+					else " $Host_4Test is not Reachable by Ping. "
+				fi
+			while true;
+			do
+			read -p "Do You wanna Try other Host? [Y/N]:" Answer
+			case $Answer in
+
+				Y) 
+					read -p "Enter Host/IP: " Host_4Test
+					echo "Pinging Host $Host_4Test"
+					ping -c 1 $Host_4Test
+					if [ "$?" -eq "0" ]
+						then 
+						echo " $Host_4Test is Reachable by ping. "
+						else " $Host_4Test is not Reachable by Ping. "
+					fi
+					continue;;
+				
+		#Exit
+
+			N) echo "You are Welcome."; break;;
+			*) echo "Please answer yes or no.";;
+			esac
+			done
+		continue;;
+		
+		# Port Checking Utility
+		b)
+			read -p "Enter Host/IP: " Host_4Test
+			read -p " Enter Port: " Port_4Test
+			telnet $Host_4Test $Port_4Test 
+			if [ "$?" -eq "0" ]
+					then 
+					echo " $Host_4Test and $Port_4Test Reachable by ping. "
+					else " $Host_4Test and $Port_4Test  is not open. "
+				fi
+			while true;
+			do
+				read -p "Do You wanna Try other Host? [Y/N]:" Answer
+				case $Answer in
+				Y) 
+					read -p "Enter Host/IP: " Host_4Test
+					read -p " Enter Port: " Port_4Test
+					telnet $Host_4Test $Port_4Test
+					if [ "$?" -eq "0" ]
+						then 
+						echo " $Host_4Test and $Port_4Test Reachable by ping. "
+						else " $Host_4Test and $Port_4Test  is not open. "
+					fi
+					continue;;
+
+				N) echo "You are Welcome."; break;;
+				*) echo "Please answer yes or no.";;
+				esac
+			done
+			break;;
+		# Updating and installing needed tools
+		x) 	apt update && apt upgrade && apt install telnet net-tools; 
+			continue;;
+			
+		# Exiting 
+		z) echo " You are always welcome"; exit;;
+		*) echo "Please chosse an operation.";;
+
+		esac
+		done
+		}
+		
+function diskManagement(){
+echo "
+	Please Choose The operation:
+	
+	1) What is Disk Information?
+
+	z) Get the hell out 
+
+	You are always welcome, Darling
+	"
+while true;
+do
+read -p "operation: " Op
+	case $Op in
+	
+		
+	#Disk Infomation
+	1) 	echo "This is the Usage and Files of The system
+			$(df -H)
+			"
+
+		echo "$(fdisk -l)
+			"
+		continue;;
+
+	#
+	# Exiting 
+	z) echo " You are always welcome"; exit;;
+	*) echo "Please chosse an operation.";;
+
+	esac
+	done
+	}
+case $MainCat in 
+	A) networking; continue;;
+	B) diskManagement; continue;;
+	*) echo "Please chosse an operation.";;
+esac
+done
